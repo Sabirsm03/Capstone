@@ -1,0 +1,535 @@
+home.js
+
+import React, { useState } from "react";
+import {
+AppBar,
+Toolbar,
+Typography,
+Button,
+IconButton,
+InputBase,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import { Link } from "react-router-dom";
+
+export default function NavBar ({ isLoggedIn, isAdmin }) {
+const [setIsLoggedIn] = useState(false);
+const [setIsAdmin] = useState(false);
+
+const handleLogout = () => {
+// Handle logout logic here
+setIsLoggedIn(false);
+setIsAdmin(false);
+};
+
+return (
+<AppBar position="static">
+    <Toolbar>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            My App
+        </Typography>
+        <div>
+            <InputBase placeholder="Search..." sx={{ mr: 1 }} />
+            <IconButton color="inherit" aria-label="search" sx={{ p: "10px" }}>
+                <SearchIcon />
+            </IconButton>
+        </div>
+        <Button component={Link} to="/" color="inherit">
+            Home
+        </Button>
+        {isAdmin && (
+        <Button component={Link} to="/add-products" color="inherit">
+            Add Products
+        </Button>
+        )}
+        {isLoggedIn ? (
+        <Button color="inherit" onClick={handleLogout}>
+            Logout
+        </Button>
+        ) : (
+        <Button component={Link} to="/login" color="inherit">
+            Login
+        </Button>
+        )}
+    </Toolbar>
+</AppBar>
+);
+};
+
+
+
+Copyright.js
+
+import { Typography } from "@mui/material";
+import { Link } from "react-router-dom";
+
+function Copyright(props) {
+return (
+<Typography variant="body2" color="text.secondary" align="center" {...props}>
+    {"Copyright © "}
+    <Link color="inherit" href="https://mui.com/">
+    upGrad Eshop
+    </Link>{" "}
+    {new Date().getFullYear()}
+    {"."}
+</Typography>
+);
+}
+
+export default Copyright;
+
+Loggedpage.js
+
+import React, {useState} from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+// import upgradLogo from "./Asset/Upgrad logo.png";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+
+export default function LoggedPage() {
+
+const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [isAdmin, setIsAdmin] = useState(false);
+const Logout = () => {
+setIsLoggedIn(false);
+setIsAdmin(false);
+window.location.href = "/";
+
+};
+return (
+<Box sx={{ flexGrow: 1 }}>
+    <AppBar position="static">
+        <Toolbar>
+            <IconButton size="large" edge="start" color="transparent" aria-label="menu" sx={{ mr: 2 }}>
+                <ShoppingCartIcon />
+            </IconButton>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                upGrad Eshop
+            </Typography>
+            <input type="text" placeholder="Search" />
+            <Button variant="contained" onClick={Logout}>
+                Logout
+            </Button>
+        </Toolbar>
+    </AppBar>
+</Box>
+);
+}
+
+Navbar.js
+
+import * as React from "react";
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+// import upgradLogo from "./Asset/Upgrad logo.png";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { Link } from "react-router-dom";
+
+export default function NavBar () {
+const onClickSignupHandler = (e) => {
+e.preventDefault();
+
+window.location.href = "/users";
+};
+
+const onClickLogininHandler = (e) => {
+e.preventDefault();
+
+window.location.href = "/auth";
+};
+
+return (
+<Box sx={{ flexGrow: 1 }}>
+    <AppBar position="static">
+        <Toolbar>
+            <IconButton size="large" edge="start" color="transparent" aria-label="menu" sx={{ mr: 2 }}>
+                <ShoppingCartIcon />
+            </IconButton>
+
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                {/* <img src={upgradLogo} alt="upGrad Eshop Logo" /> */}
+                upGrad Eshop
+            </Typography>
+
+            <Link to="SignIn">
+            <Button variant="contained" onClick={onClickLogininHandler}>
+                Sign In
+            </Button>
+            </Link>
+
+            <Link to="signup">
+            <Button variant="contained" onClick={onClickSignupHandler}>
+                Sign up
+            </Button>
+            </Link>
+        </Toolbar>
+    </AppBar>
+</Box>
+);
+};
+
+signin.js
+
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import NavBar from "./Navbar";
+import CopyRight from "./Asset/CopyRight";
+import LoggedPage from "./Asset/LoggedPage";
+import Button from "@mui/material/Button";
+import CssBaseline from "@mui/material/CssBaseline";
+import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import axios from "axios";
+
+const defaultTheme = createTheme();
+
+export default function SignIn(props) {
+const [email, setEmail] = useState("");
+const [password, setPassword] = useState("");
+const [isLoggedIn, setIsLoggedIn] = useState(false);
+const [isAdmin, setIsAdmin] = useState(false);
+
+const handleSubmit = async (e) => {
+e.preventDefault();
+
+try {
+// Send signup data to the API
+const response = await axios.post("http://localhost:3001/api/v1/auth", {
+email,
+password,
+});
+
+// Send login data to the API for authentication
+// const response = await axios.post("/api/v1/auth", { email, password });
+
+setIsLoggedIn(true);
+setIsAdmin(response.data.isAdmin);
+
+localStorage.setItem("email", email);
+localStorage.setItem("password", password);
+} catch (error) {
+console.error(error.response.data);
+}
+};
+
+useEffect(() => {
+const savedEmail = localStorage.getItem("email");
+const savedPassword = localStorage.getItem("password");
+
+// If there is saved data, set it in the component state
+if (savedEmail && savedPassword) {
+setEmail(savedEmail);
+setPassword(savedPassword);
+}
+}, []);
+
+const HandleSignupClick = async (e) => {
+e.preventDefault();
+
+if (isLoggedIn) {
+window.location.href = "/products";
+}
+};
+
+return (
+<ThemeProvider theme={defaultTheme}>
+    <NavBar />
+    {isLoggedIn ? (
+    <div className="header-container">
+        <LoggedPage />
+        {isAdmin &&
+        <Link to="/add-products">Add Products</Link>}
+    </div>
+    ) : (
+    <Container component="main" maxWidth="xs">
+        <CssBaseline />
+
+        <Box sx={{ marginTop: 8, display: "flex" , flexDirection: "column" , alignItems: "center" , }}>
+            <Typography component="h1" variant="h5">
+                Sign In
+            </Typography>
+            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+                <TextField margin="normal" required fullWidth id="email" label="Email Address" name="email"
+                    autoComplete="email" autoFocus value={email} onChange={(e)=> setEmail(e.currentTarget.value)}
+                    />
+                    <TextField margin="normal" required fullWidth name="password" label="Password" type="password"
+                        id="password" value={password} autoComplete="current-password" onChange={(e)=>
+                        setPassword(e.currentTarget.value)}
+                        />
+                        <FormControlLabel control={<Checkbox value="remember" color="primary" />}
+                        label="Remember me"
+                        />
+                        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                            Sign In
+                        </Button>
+                        <Grid container>
+                            <Grid item xs>
+                                <Link href="#" variant="body2">
+                                Forgot password?
+                                </Link>
+                            </Grid>
+                            <Grid item>
+                                <Link href="#" variant="body2" onClick={HandleSignupClick}>
+                                {"Don't have an account? Sign Up"}
+                                </Link>
+                            </Grid>
+                        </Grid>
+            </Box>
+        </Box>
+        <CopyRight sx={{ mt: 5 }} />
+    </Container>
+    )}
+</ThemeProvider>
+);
+}
+
+Signup.js
+
+// Method:1 using simple HTML and Material Ui at button and Textfield
+
+// import React, { useState } from "react";
+// import { Button, TextField } from "@mui/material";
+
+// const SignupPage = (props) => {
+// const [userName, setUserName] = useState("");
+// const [password, setPassword] = useState("");
+// const [rePassword, setRePassword] = useState("");
+// const [error, setError] = useState("");
+
+// const handleUserNameChange = (e) => {
+// setUserName(e.target.value);
+// };
+
+// const handlePasswordChange = (e) => {
+// setPassword(e.target.value);
+// };
+
+// const handleRePasswordChange = (e) => {
+// setRePassword(e.target.value);
+// };
+
+// const handleSubmit = (e) => {
+// e.preventDefault();
+// const data = new FormData(e.currentTarget);
+// if (password !== rePassword) {
+// setError("Passwords do not match");
+// } else if (!password.match(/[!@#$%^&*(),.?":{}|<>]/)) {
+    // setError("Password must contain at least one special character");
+    // } else {
+    // setUserName("");
+    // setPassword("");
+    // setRePassword("");
+    // setError("");
+    // console.log("passed");
+    // console.log({
+    // email: data.get('email'),
+    // password: data.get('password'),
+    // });
+    // }
+    // };
+
+    // return (
+    // <div>
+        // <form onSubmit={handleSubmit}>
+            // <h2>Signup</h2>
+            // <div>
+                //
+                <TextField // variant="standard" // label="UserName" // type="text" // value={userName} //
+                    placeholder="Enter Username" // onChange={handleUserNameChange} // />
+                //
+            </div>
+
+            // <div>
+                //
+                <TextField // variant="standard" // label="Password" // type="password" // value={password} //
+                    placeholder="Enter Password" // onChange={handlePasswordChange} // />
+                //
+            </div>
+
+            // <div>
+                //
+                <TextField // variant="standard" // label="Re-password" // type="password" // value={rePassword} //
+                    placeholder="Re-enter Password" // onChange={handleRePasswordChange} // />
+                // {error && <p>{error}</p>}
+                //
+            </div>
+
+            // <div>
+                // <Button variant="contained" type="submit">
+                    // Submit
+                    // </Button>
+                // </div>
+            // </form>
+        // </div>
+    // );
+    // };
+
+    // export default SignupPage;
+
+
+    // Method:2 using Material Ui
+
+    import React, { useState} from "react";
+    import Button from "@mui/material/Button";
+    import CssBaseline from "@mui/material/CssBaseline";
+    import TextField from "@mui/material/TextField";
+    import FormControlLabel from "@mui/material/FormControlLabel";
+    import Checkbox from "@mui/material/Checkbox";
+    import Link from "@mui/material/Link";
+    import Grid from "@mui/material/Grid";
+    import Box from "@mui/material/Box";
+    import Typography from "@mui/material/Typography";
+    import Container from "@mui/material/Container";
+    import { createTheme, ThemeProvider } from "@mui/material/styles";
+    import Navbar from "./Navbar";
+    import CopyRight from "./Asset/CopyRight";
+    import axios from "axios";
+
+    const defaultTheme = createTheme();
+
+    export default function SignUp() {
+
+    const [firstName, setFirstName] = React.useState("");
+    const [lastName, setLastName] = React.useState("");
+    const[password, setPassword] = useState("");
+    const[rePassword, setRePassword] = useState("");
+    const [email, setEmail] = React.useState("");
+
+    // const [submitAction, setSubmitAction] = React.useState(false);
+
+    const handleSubmit = async (e) => {
+    e.preventDefault();
+    const data = new FormData(e.currentTarget);
+
+    const userData = {
+    firstName: data.get("firstName"),
+    lastName: data.get("lastName"),
+    email: data.get("email"),
+    password: data.get("password"),
+    rePassword: data.get("rePassword")
+    };
+
+    try {
+    // Make a POST request to the signup API endpoint
+    const response = await axios.post("http://localhost:3001/api/v1/users", userData);
+
+    console.log(response.data);
+
+    localStorage.setItem("userData", JSON.stringify(userData));
+
+    // Redirect to the homepage
+    window.location.href = "./";
+    } catch (error) {
+    console.error(error);
+    // Handle any errors that occurred during the API call
+    }
+    };
+
+    const HandleSigninClick = (e) => {
+    e.preventDefault();
+
+    window.location.href = "/auth";
+    };
+
+    return (
+    <ThemeProvider theme={defaultTheme}>
+        <Navbar />
+        <Container component="main" maxWidth="xs">
+            <CssBaseline />
+            <Box sx={{ marginTop: 8, display: "flex" , flexDirection: "column" , alignItems: "center" , }}>
+
+                <Typography component="h1" variant="h5">
+                    Sign up
+                </Typography>
+                <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                            <TextField autoComplete="given-name" name="firstName" required fullWidth id="firstName"
+                                label="First Name" value={firstName} autoFocus onChange={(e)=>
+                                setFirstName(e.target.value)}
+                                />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                            <TextField required fullWidth id="lastName" label="Last Name" name="lastName"
+                                value={lastName} autoComplete="family-name" onChange={(e)=> setLastName(e.target.value)}
+                                />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField required fullWidth id="email" label="Email Address" name="email" value={email}
+                                autoComplete="email" onChange={(e)=> setEmail(e.target.value)}
+                                />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField required fullWidth name="password" label="Password" type="password" id="password"
+                                value={password} autoComplete="password" onChange={(e)=>
+                                setPassword(e.currentTarget.value)}
+                                />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField required fullWidth name="password" label="RePassword" type="password"
+                                id="rePassword" value={rePassword} autoComplete="Re-password" onChange={(e)=>
+                                setRePassword(e.target.value)}
+                                />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <FormControlLabel control={ <Checkbox value="allowExtraEmails" color="primary" />
+                            }
+                            label="I want to receive inspiration, marketing promotions and updates via email."
+                            />
+                        </Grid>
+                    </Grid>
+                    <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                        Sign Up
+                    </Button>
+                    <Grid container justifyContent="center">
+                        <Grid item>
+                            <Link href="#" variant="body2" onClick={HandleSigninClick}>
+                            Already have an account? Sign in
+                            </Link>
+                        </Grid>
+                    </Grid>
+                </Box>
+            </Box>
+            <CopyRight sx={{ mt: 5 }} />
+        </Container>
+    </ThemeProvider>
+    );
+    }
+
+
+    App.js
+
+    import React from "react";
+    import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+    import Signup from "./component/SignUp";
+    import SignIn from "./component/SignIn";
+    import ProductsPage from "./component/ProductPage";
+
+    function App() {
+    return (
+    <React.Fragment>
+        <Router>
+            <Routes>
+                <Route path="/" element={<Navigate to="/auth" />} />
+                <Route exact path="/users" element={<Signup />} />
+                <Route path="/auth" element={<SignIn />} />
+                <Route exact path="/products" component={ProductsPage} />
+            </Routes>
+        </Router>
+    </React.Fragment>
+    );
+    }
